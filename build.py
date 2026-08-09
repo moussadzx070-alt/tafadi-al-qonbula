@@ -19,9 +19,10 @@ REQUIRED = [
 
 
 def main() -> int:
-    # التحقق من وجود الملفات المطلوبة
+    # التحقق من ملفات assets المطلوبة
     missing = [
-        path for path in REQUIRED
+        path
+        for path in REQUIRED
         if not (ROOT / "assets" / path).exists()
     ]
 
@@ -30,17 +31,17 @@ def main() -> int:
             "Assets missing: " + ", ".join(missing)
         )
 
-    # حذف مجلدات البناء القديمة
+    # حذف نتائج البناء السابقة
     for folder in (ROOT / "build", ROOT / "dist"):
         if folder.exists():
             shutil.rmtree(folder)
 
-    # حذف ملف spec القديم
+    # حذف ملف spec السابق
     spec = ROOT / "tafadi-al-qonbula.spec"
     if spec.exists():
         spec.unlink()
 
-    # إعداد مسار assets حسب نظام التشغيل
+    # إعداد assets
     separator = ";" if sys.platform == "win32" else ":"
     add_data = f"assets{separator}assets"
 
@@ -52,13 +53,14 @@ def main() -> int:
         "--noconfirm",
         "--clean",
         "--windowed",
+        "--onefile",
         "--name",
         "tafadi-al-qonbula",
         "--add-data",
         add_data,
     ]
 
-    # إضافة الأيقونة إذا كانت موجودة
+    # إضافة الأيقونة
     icon = ROOT / "assets" / "app.ico"
 
     if icon.exists():
@@ -70,29 +72,29 @@ def main() -> int:
     # الملف الرئيسي
     command.append("main.py")
 
-    print("Building Windows executable...")
-    print("Command:")
-    print(" ".join(f'"{arg}"' if " " in arg else arg for arg in command))
+    print("Building Windows EXE...")
+    print()
 
-    # تنفيذ PyInstaller
     subprocess.run(
         command,
         cwd=ROOT,
         check=True,
     )
 
+    # الملف النهائي المتوقع
     exe = ROOT / "dist" / "tafadi-al-qonbula.exe"
 
     if not exe.exists():
         raise SystemExit(
-            "Build failed: EXE file was not created."
+            f"Build completed but EXE was not found: {exe}"
         )
 
     print()
-    print("=" * 50)
-    print("Build completed successfully!")
+    print("=" * 60)
+    print("BUILD SUCCESSFUL")
+    print("=" * 60)
     print(f"EXE: {exe}")
-    print("=" * 50)
+    print("=" * 60)
 
     return 0
 
