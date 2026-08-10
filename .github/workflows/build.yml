@@ -2,7 +2,8 @@ name: Build Game EXE
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
+  workflow_dispatch: # هذا السطر السحري هو الذي سيظهر لك زر التجميع اليدوي!
 
 jobs:
   build:
@@ -23,9 +24,6 @@ jobs:
         
     - name: Build with PyInstaller
       run: |
-        # --onefile ensures it's a single EXE
-        # --windowed hides the console window (no CMD popup)
-        # --noconfirm overwrites any previous builds quietly
         pyinstaller --noconfirm --onefile --windowed main.py
         
     - name: Upload EXE artifact
