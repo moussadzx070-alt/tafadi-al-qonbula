@@ -17,6 +17,13 @@ EXCLUDED_MODULES = [
 ]
 
 def main() -> int:
+    # إجبار مخرج النصوص على استخدام UTF-8 لتفادي أخطاء الترميز في بيئات Windows
+    if hasattr(sys.stdout, 'reconfigure'):
+        try:
+            sys.stdout.reconfigure(encoding='utf-8')
+        except Exception:
+            pass
+
     missing = [p for p in REQUIRED if not (ROOT / "assets" / p).exists()]
     if missing:
         print("تنبيه: بعض الأصول مفقودة، لكن سيستمر البناء.")
@@ -46,7 +53,13 @@ def main() -> int:
     command.append("main.py")
     
     subprocess.run(command, cwd=ROOT, check=True)
-    print("Build completed: dist/تفادي القنبلة.exe")
+    
+    # رسالة نجاح آمنة لتفادي أخطاء الترميز في شاشات الكونسول الأجنبية
+    try:
+        print("Build completed: dist/تفادي القنبلة.exe")
+    except UnicodeEncodeError:
+        print("Build completed successfully! Executable generated in 'dist' folder.")
+        
     return 0
 
 if __name__ == "__main__":
